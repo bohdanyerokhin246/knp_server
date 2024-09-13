@@ -18,6 +18,7 @@ func Run() {
 	//JSON endpoint
 	r.POST("/post/create", json.CreatePost)
 	r.GET("/posts/get", json.GetPosts)
+	r.POST("/post/update", json.UpdatePost)
 
 	_ = r.Run(":8081")
 }
