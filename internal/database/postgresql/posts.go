@@ -1,6 +1,7 @@
 package postgresql
 
 import (
+	"gorm.io/gorm"
 	"knp_server/internal/config"
 )
 
@@ -24,4 +25,15 @@ func GetPosts() ([]config.Post, error) {
 	}
 
 	return posts, err.Error
+}
+
+func UpdatePost(post config.Post) error {
+
+	// UPDATE posts.posts SET `is_actual`= $1 WHERE `id` = $2
+	err := DB.Save(&config.Post{Model: gorm.Model{ID: post.ID}, IsActual: post.IsActual})
+
+	if err.Error != nil {
+		return err.Error
+	}
+	return nil
 }
