@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/schema"
 	"knp_server/internal/config"
 	"os"
 )
@@ -23,9 +22,7 @@ func Connect() {
 		os.Getenv("nameDB"),
 		os.Getenv("sslModeDB"))
 
-	DB, err = gorm.Open(postgres.Open(connStr), &gorm.Config{
-		NamingStrategy: schema.NamingStrategy{
-			TablePrefix: "posts."}})
+	DB, err = gorm.Open(postgres.Open(connStr), &gorm.Config{})
 
 	if err != nil {
 		fmt.Printf("Error conection to DB. Error: %v", err)
