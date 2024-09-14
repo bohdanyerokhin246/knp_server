@@ -10,3 +10,9 @@ type Post struct {
 	CreateDate string `json:"createDate"`
 	Link       string `json:"link"`
 }
+
+type PostRequest struct {
+	Post
+	FileData string `json:"fileData"`
+	FileName string `json:"fileName"`
+}
