@@ -16,3 +16,15 @@ type PostRequest struct {
 	FileData string `json:"fileData"`
 	FileName string `json:"fileName"`
 }
+
+type Statistic struct {
+	gorm.Model
+	FullName       string `json:"fullName"`
+	Unit           string `json:"unit"`
+	Package        string `json:"package"`
+	EmzAmount      int    `json:"emzAmount"`
+	PatientsAmount int    `json:"patientsAmount"`
+	ServicesAmount int    `json:"servicesAmount"`
+	Rate           int    `json:"rate"`
+	Payment        int    `json:"payment"`
+}

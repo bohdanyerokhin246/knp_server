@@ -14,7 +14,7 @@ func Connect() {
 	var err error
 
 	connStr := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		"host=localhost port=%s user=%s password=%s dbname=%s sslmode=%s",
 		os.Getenv("hostDB"),
 		os.Getenv("portDB"),
 		os.Getenv("userDB"),
@@ -29,6 +29,11 @@ func Connect() {
 	}
 
 	err = DB.AutoMigrate(&config.Post{})
+	if err != nil {
+		fmt.Printf("Error with AutoMigrate. Error: %v", err.Error())
+	}
+
+	err = DB.AutoMigrate(&config.Statistic{})
 	if err != nil {
 		fmt.Printf("Error with AutoMigrate. Error: %v", err.Error())
 	}
