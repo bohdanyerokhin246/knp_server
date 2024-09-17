@@ -33,4 +33,9 @@ func Connect() {
 		fmt.Printf("Error with AutoMigrate. Error: %v", err.Error())
 	}
 
+	err = DB.AutoMigrate(&config.Statistic{})
+	if err != nil {
+		fmt.Printf("Error with AutoMigrate. Error: %v", err.Error())
+	}
+
 }

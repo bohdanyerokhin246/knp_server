@@ -20,5 +20,7 @@ func Run() {
 	r.GET("/posts/get", json.GetPosts)
 	r.POST("/post/update", json.UpdatePost)
 
+	r.GET("/statistics/get", json.GetStatistics)
+
 	_ = r.Run(":8081")
 }
