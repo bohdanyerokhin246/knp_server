@@ -6,48 +6,16 @@ import (
 	"net/http"
 )
 
-func GetStatisticsOrderByDoctor(c *gin.Context) {
+func GetStatistics(c *gin.Context) {
 
-	statistics, err := postgresql.GetStatisticsOrderByDoctor()
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"Error": err.Error(),
-		})
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"Statistics": statistics,
-		})
-	}
-
-}
-func GetStatisticsOrderByUnit(c *gin.Context) {
-
-	statistics, err := postgresql.GetStatisticsOrderByUnit()
+	statistics, err := postgresql.GetStatistics()
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"Error": err.Error(),
 		})
 	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"Statistics": statistics,
-		})
-	}
-
-}
-func GetStatisticsOrderByPackage(c *gin.Context) {
-
-	statistics, err := postgresql.GetStatisticsOrderByPackage()
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"Error": err.Error(),
-		})
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"Statistics": statistics,
-		})
+		c.JSON(http.StatusOK, statistics)
 	}
 
 }

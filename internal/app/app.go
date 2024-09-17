@@ -20,11 +20,7 @@ func Run() {
 	r.GET("/posts/get", json.GetPosts)
 	r.POST("/post/update", json.UpdatePost)
 
-	//r.POST("/post/create", json.CreatePost)
-	r.GET("/statisticsOrderByDoctor/get", json.GetStatisticsOrderByDoctor)
-	r.GET("/statisticsOrderByUnit/get", json.GetStatisticsOrderByUnit)
-	r.GET("/statisticsOrderByPackage/get", json.GetStatisticsOrderByPackage)
-	//r.POST("/post/update", json.UpdatePost)
+	r.GET("/statistics/get", json.GetStatistics)
 
 	_ = r.Run(":8081")
 }
