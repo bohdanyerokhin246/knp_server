@@ -67,9 +67,7 @@ func GetPosts(c *gin.Context) {
 			"Error": err.Error(),
 		})
 	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"body": posts,
-		})
+		c.JSON(http.StatusOK, posts)
 	}
 
 }
