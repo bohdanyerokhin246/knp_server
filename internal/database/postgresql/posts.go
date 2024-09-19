@@ -1,7 +1,6 @@
 package postgresql
 
 import (
-	"gorm.io/gorm"
 	"knp_server/internal/config"
 )
 
@@ -18,7 +17,7 @@ func GetPosts() ([]config.Post, error) {
 	var posts []config.Post
 
 	// SELECT * FROM posts.posts WHERE is_actual = true ORDER BY id desc
-	err := DB.Where("is_actual = ?", "true").Order("id desc").Find(&posts)
+	err := DB.Order("id desc").Find(&posts)
 
 	if err.Error != nil {
 		return nil, err.Error
@@ -30,7 +29,7 @@ func GetPosts() ([]config.Post, error) {
 func UpdatePost(post config.Post) error {
 
 	// UPDATE posts.posts SET `is_actual`= $1 WHERE `id` = $2
-	err := DB.Save(&config.Post{Model: gorm.Model{ID: post.ID}, IsActual: post.IsActual})
+	err := DB.Model(&post).Where("id = ?", post.ID).Update("is_actual", post.IsActual)
 
 	if err.Error != nil {
 		return err.Error
