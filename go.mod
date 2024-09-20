@@ -4,6 +4,7 @@ go 1.22
 
 require (
 	github.com/gin-gonic/gin v1.10.0
+	github.com/tealeg/xlsx v1.0.5
 	gorm.io/driver/postgres v1.5.7
 	gorm.io/gorm v1.25.10
 )
