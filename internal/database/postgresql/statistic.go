@@ -15,3 +15,12 @@ func GetStatistics() ([]config.Statistic, error) {
 
 	return statistics, err.Error
 }
+
+func InsertStatistic(statistic config.StatisticFromExcel) error {
+
+	err := DB.Omit("")
+	if err != nil {
+		return err.Error
+	}
+	return nil
+}
