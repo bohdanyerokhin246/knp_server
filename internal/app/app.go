@@ -22,5 +22,9 @@ func Run() {
 
 	r.GET("/statistics/get", json.GetStatistics)
 
+	r.POST("/flg/patient/create", json.CreatePatient)
+	//r.POST("/flg/diagnose/create", json.GetPosts)
+	//r.POST("/flg/exam/create", json.UpdatePost)
+
 	_ = r.Run(":8081")
 }
