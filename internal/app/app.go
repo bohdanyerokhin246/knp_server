@@ -15,16 +15,58 @@ func Run() {
 
 	r.Use(middleware.CORSMiddleware())
 
-	//JSON endpoint
-	r.POST("/post/create", json.CreatePost)
-	r.GET("/posts/get", json.GetPosts)
-	r.POST("/post/update", json.UpdatePost)
+	r.Use(middleware.AuthMiddleware)
 
-	r.GET("/statistics/get", json.GetStatistics)
+	r.POST("/login", json.Login)
 
-	r.POST("/flg/patient/create", json.CreatePatient)
-	//r.POST("/flg/diagnose/create", json.GetPosts)
-	//r.POST("/flg/exam/create", json.UpdatePost)
+	r.POST("/posts", json.CreatePost)
+	r.GET("/posts", json.GetPosts)
+	r.PUT("/posts", json.UpdatePost)
+
+	r.GET("/statistics", json.GetAllEmz)
+	r.GET("/statistics/included/summarized", json.GetIncludedSummarizeStatistic)
+	r.GET("/statistic/departments", json.GetUnitOfDoctor)
+	r.POST("/statistic/emzs", json.CreateEmz)
+	r.POST("/statistic/patients", json.CreateStatisticPatient)
+	r.GET("/statistics/summarize", json.GetSummarizeStatistic)
+
+	r.POST("/flg/patients", json.CreatePatient)
+	r.POST("/flg/diagnoses", json.CreateDiagnose)
+	r.GET("/flg/exams", json.GetExams)
+	r.POST("/flg/exams", json.CreateExam)
+	r.POST("/flg/therapists", json.CreateTherapist)
+
+	r.GET("/monitors", json.GetMonitors)
+	r.POST("/monitors", json.CreateMonitor)
+	//r.GET("/monitor/update", json.GetMonitors)
+
+	r.POST("/contracts", json.CreateContract)
+	//r.GET("/monitor/get", json.GetMonitors)
+	//r.GET("/monitor/update", json.GetMonitors)
+
+	r.POST("/periphery/create", json.CreatePeriphery)
+	//r.GET("/periphery/get", json.GetMonitors)
+	//r.GET("/periphery/update", json.GetMonitors)
+
+	r.POST("/computer/create", json.CreateComputer)
+	r.GET("/computer/get", json.GetComputers)
+	//r.GET("/monitor/update", json.GetMonitors)
+
+	r.POST("/processor/create", json.CreateProcessor)
+	//r.GET("/monitor/get", json.GetMonitors)
+	//r.GET("/monitor/update", json.GetMonitors)
+
+	r.POST("/storageDevice/create", json.CreateStorageDevice)
+	//r.GET("/monitor/get", json.GetMonitors)
+	//r.GET("/monitor/update", json.GetMonitors)
+
+	r.POST("/ram/create", json.CreateRAM)
+	//r.GET("/monitor/get", json.GetMonitors)
+	//r.GET("/monitor/update", json.GetMonitors)
+
+	r.POST("/responsePerson/create", json.CreateResponsePerson)
+	//r.GET("/monitor/get", json.GetMonitors)
+	//r.GET("/monitor/update", json.GetMonitors)
 
 	_ = r.Run(":8081")
 }
