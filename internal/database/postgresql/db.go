@@ -4,11 +4,18 @@ import (
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 	"knp_server/internal/config"
 	"os"
 )
 
-var DB *gorm.DB
+var DBTest *gorm.DB
+var DBSite *gorm.DB
+var DBUser *gorm.DB
+var DBPost *gorm.DB
+var DBStatistic *gorm.DB
+var DBMedical *gorm.DB
+var DBStorage *gorm.DB
 
 func Connect() {
 	var err error
@@ -22,39 +29,84 @@ func Connect() {
 		os.Getenv("nameDB"),
 		os.Getenv("sslModeDB"))
 
-	DB, err = gorm.Open(postgres.Open(connStr), &gorm.Config{})
+	DBSite, err = gorm.Open(postgres.Open(connStr), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix: "site."},
+	})
+
+	DBUser, err = gorm.Open(postgres.Open(connStr), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix: "user."},
+	})
+
+	DBPost, err = gorm.Open(postgres.Open(connStr), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix: "post."},
+	})
+
+	DBMedical, err = gorm.Open(postgres.Open(connStr), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix: "flg."},
+	})
+
+	DBStatistic, err = gorm.Open(postgres.Open(connStr), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix: "statistic."},
+	})
+
+	DBStorage, err = gorm.Open(postgres.Open(connStr), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix: "storage."},
+	})
+
+	err = DBSite.AutoMigrate(
+		&config.Menu{},
+		&config.Page{})
 	if err != nil {
-		fmt.Printf("Error conection to DB. Error: %v", err)
+		fmt.Printf("Error with migration DBPost. Error: %v", err.Error())
 	}
 
-	err = DB.AutoMigrate(&config.Post{})
+	err = DBUser.AutoMigrate(&config.User{})
 	if err != nil {
-		fmt.Printf("Error with migration Post. Error: %v", err.Error())
+		fmt.Printf("Error with migration DBPost. Error: %v", err.Error())
 	}
 
-	err = DB.AutoMigrate(&config.Statistic{})
+	err = DBPost.AutoMigrate(&config.Post{})
 	if err != nil {
-		fmt.Printf("Error with migration Statistic. Error: %v", err.Error())
+		fmt.Printf("Error with migration DBPost. Error: %v", err.Error())
 	}
 
-	err = DB.AutoMigrate(&config.StatisticFromExcel{})
+	err = DBStatistic.AutoMigrate(
+		&config.EMZ{},
+		&config.StatisticPatient{})
 	if err != nil {
-		fmt.Printf("Error with migration StatisticFromExcel. Error: %v", err.Error())
+		fmt.Printf("Error with migration DBStatistic. Error: %v", err.Error())
 	}
 
-	err = DB.AutoMigrate(&config.Patient{})
+	err = DBMedical.AutoMigrate(
+		&config.Patient{},
+		&config.Therapist{},
+		&config.Diagnose{},
+		&config.Exam{})
 	if err != nil {
-		fmt.Printf("Error with migration Patient. Error: %v", err.Error())
+		fmt.Printf("Error with migration DBMedical. Error: %v", err.Error())
 	}
 
-	err = DB.AutoMigrate(&config.Diagnose{})
+	err = DBStorage.AutoMigrate(
+		&config.Monitor{},
+		&config.Cartridge{},
+		&config.Computer{},
+		&config.CabinetCard{},
+		&config.StorageDevice{},
+		&config.Processor{},
+		&config.Contract{},
+		&config.Periphery{},
+		&config.Movement{},
+		&config.Printer{},
+		&config.Repair{},
+		&config.RespPerson{},
+		&config.RAM{})
 	if err != nil {
-		fmt.Printf("Error with migration Diagnose. Error: %v", err.Error())
+		fmt.Printf("Error with migration DBSorage. Error: %v", err.Error())
 	}
-
-	err = DB.AutoMigrate(&config.Exam{})
-	if err != nil {
-		fmt.Printf("Error with migration Exam. Error: %v", err.Error())
-	}
-
 }
