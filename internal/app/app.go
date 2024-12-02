@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/gin-gonic/gin"
 	"knp_server/internal/database/postgresql"
+	"knp_server/internal/middleware"
 	"knp_server/internal/transport/json"
 	"net/http"
 )
