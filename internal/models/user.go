@@ -1,4 +1,4 @@
-package config
+package models
 
 import "github.com/golang-jwt/jwt/v4"
 
@@ -14,7 +14,16 @@ type Credentials struct {
 }
 
 type Claims struct {
-	//Username string `json:"username,omitempty"`
-	Role string `json:"role,omitempty"`
+	Username string `json:"username,omitempty"`
+	Role     string `json:"role,omitempty"`
 	jwt.RegisteredClaims
+}
+
+type LoginRequest struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+type LoginResponse struct {
+	Token string `json:"token"`
 }

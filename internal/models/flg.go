@@ -1,4 +1,4 @@
-package config
+package models
 
 import "time"
 
@@ -13,7 +13,7 @@ type Therapist struct {
 	FullName string `json:"full_name,omitempty"`
 }
 
-type Diagnose struct {
+type DiagnoseFLG struct {
 	ID       uint   `json:"id" gorm:"primaryKey"`
 	Diagnose string `json:"diagnose"`
 }

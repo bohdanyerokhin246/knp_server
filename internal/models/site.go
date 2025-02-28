@@ -1,4 +1,4 @@
-package config
+package models
 
 type Page struct {
 	Path     string `json:"path,omitempty"`
