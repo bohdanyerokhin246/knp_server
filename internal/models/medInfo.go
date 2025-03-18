@@ -8,7 +8,7 @@ type ODK struct {
 
 type Diagnose struct {
 	ID    uint   `gorm:"primaryKey" json:"id,omitempty"`
-	ODKID uint   `gorm:"not null" json:"odk_id,omitempty"` // Внешний ключ
+	ODKID string `gorm:"not null" json:"odk_id,omitempty"` // Внешний ключ
 	Code  string `gorm:"not null" json:"code,omitempty"`
 	Name  string `gorm:"not null" json:"name,omitempty"`
 }
@@ -45,8 +45,8 @@ type Consultation struct {
 	ClassName        string       `gorm:"not null" json:"className,omitempty"`
 	Code             string       `gorm:"not null" json:"code,omitempty"`
 	InterventionName string       `gorm:"not null" json:"intervention_name,omitempty"`
-	ODKs             []ODK        `gorm:"many2many:procedure_odks;" json:"odks,omitempty"`
-	Specialists      []Specialist `gorm:"many2many:procedure_specialists;" json:"specialists,omitempty"`
+	ODKs             []ODK        `gorm:"many2many:consultation_odks;" json:"odks,omitempty"`
+	Specialists      []Specialist `gorm:"many2many:consultation_specialists;" json:"specialists,omitempty"`
 }
 
 type ConsultationODK struct {

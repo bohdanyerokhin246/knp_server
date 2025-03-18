@@ -10,3 +10,12 @@ type Menu struct {
 	Path  string `json:"path,omitempty"`
 	Group string `json:"group,omitempty"`
 }
+
+type MenuItem struct {
+	ID       uint       `gorm:"primaryKey" json:"id"`
+	Name     string     `json:"name"`
+	Link     string     `json:"link"`
+	Roles    string     `json:"roles"`
+	Submenu  []MenuItem `gorm:"foreignKey:ParentID" json:"submenu,omitempty"`
+	ParentID *uint      `gorm:"index" json:"-"`
+}

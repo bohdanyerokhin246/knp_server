@@ -1,16 +1,18 @@
-package postgresql
+package queries
 
 import (
 	"database/sql"
+	"fmt"
 	"gorm.io/gorm/clause"
-	"knp_server/internal/config"
+	"knp_server/internal/database/postgresql"
+	"knp_server/internal/models"
 	"log"
 )
 
-func CreateStatisticPatient(patients []config.StatisticPatient) error {
+func CreateStatisticPatient(patients []models.StatisticPatient) error {
 
 	for _, patient := range patients {
-		result := DBStatistic.Create(&patient)
+		result := postgresql.DB.Statistic.Create(&patient)
 		if result.Error != nil {
 			return result.Error
 		}
@@ -19,7 +21,7 @@ func CreateStatisticPatient(patients []config.StatisticPatient) error {
 }
 
 func GetDepartmentByDoctor() (map[string]string, error) {
-	rows, err := DBStatistic.Raw(
+	rows, err := postgresql.DB.Statistic.Raw(
 		`SELECT 
     			statistic.doctor_department.doctor_name,
     			statistic.doctor_department.department_name 
@@ -51,11 +53,11 @@ func GetDepartmentByDoctor() (map[string]string, error) {
 	return result, nil
 }
 
-func CreateEmzs(statistics []config.EMZ) error {
+func CreateEmzs(statistics []models.EMZ) error {
 	for _, statistic := range statistics {
 		//If emz_id unique create emz in statistic.emz
 		//else ignore emz
-		result := DBStatistic.Clauses(clause.OnConflict{
+		result := postgresql.DB.Statistic.Clauses(clause.OnConflict{
 			Columns:   []clause.Column{{Name: "emz_id"}},
 			DoNothing: true,
 		}).
@@ -71,8 +73,8 @@ func CreateEmzs(statistics []config.EMZ) error {
 func CorrectionEMZPaymentActual() error {
 
 	var err error
-	var patientsList []config.StatisticPatient
-	var emzList []*config.EMZ
+	var patientsList []models.StatisticPatient
+	var emzList []*models.EMZ
 
 	//Get list of all patients from statistic.statistic_patients
 	patientsList, err = getPatientsList()
@@ -89,6 +91,7 @@ func CorrectionEMZPaymentActual() error {
 			patient.Package)
 
 		if err != nil {
+
 			return err
 		}
 
@@ -106,15 +109,14 @@ func CorrectionEMZPaymentActual() error {
 			return err
 		}
 	}
-
 	return nil
 }
 
-func getPatientsList() ([]config.StatisticPatient, error) {
+func getPatientsList() ([]models.StatisticPatient, error) {
 
-	var patientsList []config.StatisticPatient
+	var patientsList []models.StatisticPatient
 
-	err := DBStatistic.Order("patient_id asc").Find(&patientsList)
+	err := postgresql.DB.Statistic.Order("patient_id asc").Find(&patientsList)
 
 	if err.Error != nil {
 		return nil, err.Error
@@ -123,11 +125,11 @@ func getPatientsList() ([]config.StatisticPatient, error) {
 	return patientsList, nil
 }
 
-func getAllEMZByPatientID(year, month int, patientID, packageName string) ([]*config.EMZ, error) {
+func getAllEMZByPatientID(year, month int, patientID, packageName string) ([]*models.EMZ, error) {
 
-	var EMZList []*config.EMZ
+	var EMZList []*models.EMZ
 
-	err := DBStatistic.
+	err := postgresql.DB.Statistic.
 		Unscoped().
 		Where(
 			"year = ? AND month = ? AND patients_id = ? AND package = ?",
@@ -147,13 +149,15 @@ func getAllEMZByPatientID(year, month int, patientID, packageName string) ([]*co
 
 // DivisionPaymentActualOfEMZ get array of EMZ count len of this array,
 // then changes payment_actual as follows:
-// payment_actual = capitation_rate_for_package / len([]config.EMZ)
-func divisionPaymentActualOfEMZ(EMZList []*config.EMZ) ([]*config.EMZ, error) {
+// payment_actual = capitation_rate_for_package / len([]models.EMZ)
+func divisionPaymentActualOfEMZ(EMZList []*models.EMZ) ([]*models.EMZ, error) {
 
 	for _, emz := range EMZList {
 		cost, err := getTariffByPatientID(emz.Month, emz.PatientsID, emz.Package)
 		if err != nil {
+			fmt.Println(emz.EmzID)
 			return nil, err
+
 		}
 
 		if cost == 0 {
@@ -168,9 +172,9 @@ func divisionPaymentActualOfEMZ(EMZList []*config.EMZ) ([]*config.EMZ, error) {
 
 func getTariffByPatientID(month int, patientID, packageName string) (float64, error) {
 
-	var patient config.StatisticPatient
+	var patient models.StatisticPatient
 
-	err := DBStatistic.Where("month = ? AND patient_id = ? AND package = ?", month, patientID, packageName).Find(&patient)
+	err := postgresql.DB.Statistic.Where("month = ? AND patient_id = ? AND package = ?", month, patientID, packageName).Find(&patient)
 
 	if err.Error != nil {
 		return 0.0, err.Error
@@ -179,25 +183,26 @@ func getTariffByPatientID(month int, patientID, packageName string) (float64, er
 	return patient.PaymentActual, nil
 }
 
-func updatePaymentActualByEMZ(EMZList []*config.EMZ) error {
+func updatePaymentActualByEMZ(EMZList []*models.EMZ) error {
 
-	//for _, emz := range EMZList {
-	err := DBStatistic.Save(EMZList)
-	if err.Error != nil {
-		return err.Error
+	for _, emz := range EMZList {
+		err := postgresql.DB.Statistic.Save(emz)
+		if err.Error != nil {
+			fmt.Println(emz.EmzID)
+			return err.Error
+		}
 	}
-	//}
 	return nil
 }
 
 //Statistic getters
 
-func GetStatisticAll() ([]config.EMZ, error) {
+func GetStatisticAll() ([]models.EMZ, error) {
 
-	var statistics []config.EMZ
+	var statistics []models.EMZ
 
 	// SELECT * FROM posts.posts WHERE is_actual = true ORDER BY id desc
-	err := DBStatistic.Find(&statistics)
+	err := postgresql.DB.Statistic.Find(&statistics)
 
 	if err.Error != nil {
 		return nil, err.Error
@@ -206,11 +211,10 @@ func GetStatisticAll() ([]config.EMZ, error) {
 	return statistics, err.Error
 }
 
-func GetIncludedSummarizeStatistic() []config.SummarizeStatistic {
-	var summarizeStatistic []config.SummarizeStatistic
+func GetIncludedSummarizeStatistic() []models.SummarizeStatistic {
+	var summarizeStatistic []models.SummarizeStatistic
 
-	// Выполняем запрос с использованием GORM
-	err := DBStatistic.Table("statistic.emzs").
+	err := postgresql.DB.Statistic.Table("statistic.emzs").
 		Select(
 			`month,
 					year, 
@@ -238,11 +242,10 @@ func GetIncludedSummarizeStatistic() []config.SummarizeStatistic {
 	return summarizeStatistic
 }
 
-func GetStatisticByUnit() ([]config.SummarizeStatistic, error) {
-	var summarizeStatistic []config.SummarizeStatistic
+func GetStatisticByUnit() ([]models.SummarizeStatistic, error) {
+	var summarizeStatistic []models.SummarizeStatistic
 
-	// Выполняем запрос с использованием GORM
-	err := DBStatistic.Table("statistic.emzs").
+	err := postgresql.DB.Statistic.Table("statistic.emzs").
 		Select(`
 					year, 
 					month,
@@ -269,10 +272,10 @@ func GetStatisticByUnit() ([]config.SummarizeStatistic, error) {
 	return summarizeStatistic, nil
 }
 
-func GetStatisticByPackage() ([]config.EMZ, error) {
-	var summarizedEMZ []config.EMZ
+func GetStatisticByPackage() ([]models.EMZ, error) {
+	var summarizedEMZ []models.EMZ
 
-	err := DBStatistic.Model(&config.EMZ{}).
+	err := postgresql.DB.Statistic.Model(&models.EMZ{}).
 		Select("year, month, package, SUM(payment_actual) as payment_actual").
 		Where("package != ?", "-").
 		Group("year, month, package").

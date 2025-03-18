@@ -1,22 +1,22 @@
-package json
+package handlers
 
 import (
 	"github.com/gin-gonic/gin"
-	"knp_server/internal/config"
-	"knp_server/internal/database/postgresql"
+	"knp_server/internal/database/postgresql/queries"
+	"knp_server/internal/models"
 	"net/http"
 )
 
 func CreatePatient(c *gin.Context) {
 
-	var patients []config.Patient
+	var patients []models.Patient
 	err := c.ShouldBindJSON(&patients)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err = postgresql.CreatePatient(patients)
+	err = queries.CreatePatient(patients)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -27,14 +27,14 @@ func CreatePatient(c *gin.Context) {
 
 func CreateDiagnose(c *gin.Context) {
 
-	var diagnoses []config.Diagnose
+	var diagnoses []models.DiagnoseFLG
 	err := c.ShouldBindJSON(&diagnoses)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err = postgresql.CreateDiagnose(diagnoses)
+	err = queries.CreateDiagnose(diagnoses)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -45,14 +45,14 @@ func CreateDiagnose(c *gin.Context) {
 
 func CreateTherapist(c *gin.Context) {
 
-	var therapists []config.Therapist
+	var therapists []models.Therapist
 	err := c.ShouldBindJSON(&therapists)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err = postgresql.CreateTherapist(therapists)
+	err = queries.CreateTherapist(therapists)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -63,14 +63,14 @@ func CreateTherapist(c *gin.Context) {
 
 func CreateExam(c *gin.Context) {
 
-	var exams []config.Exam
+	var exams []models.Exam
 	err := c.ShouldBindJSON(&exams)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err = postgresql.CreateExam(exams)
+	err = queries.CreateExam(exams)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -80,7 +80,7 @@ func CreateExam(c *gin.Context) {
 }
 
 func GetExams(c *gin.Context) {
-	exams, err := postgresql.GetExams()
+	exams, err := queries.GetExams()
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{

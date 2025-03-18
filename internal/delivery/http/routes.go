@@ -2,85 +2,88 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
-	"knp_server/internal/delivery/http/handlers"
+	handlers2 "knp_server/internal/delivery/http/handlers/medical"
+	"knp_server/internal/delivery/http/handlers/news"
+	"knp_server/internal/delivery/http/handlers/site"
+	"knp_server/internal/delivery/http/handlers/statistic"
+	"knp_server/internal/delivery/http/handlers/storage"
+	"knp_server/internal/middleware"
 )
 
 func RegisterRoutes(router *gin.Engine) {
 	v1 := router.Group("/v1")
+
+	v1.Use(middleware.JWTMiddleware())
 	{
-		v1.POST("/login", handlers.LoginHandler)
+		menu := v1.Group("/menu")
+		{
+			menu.GET("", GetMenu)
+		}
+
+		v1.POST("/login", site.LoginHandler)
 
 		medical := v1.Group("/medical")
 		{
 			odkClasses := medical.Group("/odk")
 			{
-				odkClasses.GET("/classes", handlers.GetODKsHandler)
-				odkClasses.GET("/classes/:id", handlers.GetODKByIDHandler)
+				odkClasses.GET("/classes", handlers2.GetODKsHandler)
+				odkClasses.GET("/classes/:id", handlers2.GetODKByIDHandler)
 			}
 
 			diagnosesByODK := medical.Group("/diagnoses")
 			{
-				diagnosesByODK.GET("/odks", handlers.GetODKDiagnosesHandler)
-				diagnosesByODK.GET("/odks/:id", handlers.GetDiagnoseByODKIdHandler)
+				diagnosesByODK.GET("/odks", handlers2.GetODKDiagnosesHandler)
+				diagnosesByODK.GET("/odks/:id", handlers2.GetDiagnoseByODKIdHandler)
 			}
 
 			specialists := medical.Group("/specialists")
 			{
-				specialists.GET("", handlers.GetSpecialistsHandler)
-				specialists.GET("/:code", handlers.GetSpecialistByCodeHandler)
+				specialists.GET("", handlers2.GetSpecialistsHandler)
+				specialists.GET("/:code", handlers2.GetSpecialistByCodeHandler)
 			}
 
 			labTests := medical.Group("/labTests")
 			{
-				labTests.GET("", handlers.GetLabTestsHandler)
-				labTests.GET("/:code", handlers.GetLabTestByCodeHandler)
+				labTests.GET("", handlers2.GetLabTestsHandler)
+				labTests.GET("/:code", handlers2.GetLabTestByCodeHandler)
 			}
 
-			consultation := medical.Group("/consultation")
+			consultation := medical.Group("/consultations")
 			{
-				consultation.GET("", handlers.GetConsultationsHandler)
-				consultation.GET("/:code", handlers.GetConsultationsByCodeHandler)
-				consultation.GET("/spec/:code", handlers.GetConsultationsBySpecialistCode)
-				consultation.POST("/create", handlers.CreateConsultation)
+				consultation.GET("", handlers2.GetConsultationsHandler)
+				consultation.GET("/:code", handlers2.GetConsultationsByCodeHandler)
+				consultation.GET("/spec/:code", handlers2.GetConsultationsBySpecialistCode)
+				consultation.POST("/create", handlers2.CreateConsultation)
 
 			}
 
 			procedures := medical.Group("/procedures")
 			{
-				procedures.GET("", handlers.GetProceduresHandler)
-				procedures.GET("/:code", handlers.GetProceduresByCodeHandler)
-				procedures.GET("/spec/:code", handlers.GetProceduresBySpecialistCode)
-				procedures.POST("/create", handlers.CreateProcedure)
+				procedures.GET("", handlers2.GetProceduresHandler)
+				procedures.GET("/:code", handlers2.GetProceduresByCodeHandler)
+				procedures.GET("/spec/:code", handlers2.GetProceduresBySpecialistCode)
+				procedures.POST("/create", handlers2.CreateProcedure)
 
 			}
 
 			instrumentalDiagnostic := medical.Group("/instrumentalDiagnostic")
 			{
-				instrumentalDiagnostic.GET("", handlers.GetInstrumentalDiagnosticHandler)
+				instrumentalDiagnostic.GET("", handlers2.GetInstrumentalDiagnosticHandler)
 				//instrumentalDiagnostic.GET("/:code", handlers.GetProceduresByCodeHandler)
-				instrumentalDiagnostic.GET("/spec/:code", handlers.GetInstrumentalDiagnosticsBySpecialistCode)
-				instrumentalDiagnostic.POST("/create", handlers.CreateInstrumentalDiagnostic)
+				instrumentalDiagnostic.GET("/spec/:code", handlers2.GetInstrumentalDiagnosticsBySpecialistCode)
+				instrumentalDiagnostic.POST("/create", handlers2.CreateInstrumentalDiagnostic)
 
 			}
 		}
 
-		storage := v1.Group("/storage")
+		file := v1.Group("/upload")
 		{
-			repair := storage.Group("/equipments")
-			{
-				repair.GET("", handlers.GetEquipmentsHandler)
-				repair.GET("/:serNumber", handlers.GetEquipmentBySerNumberHandler)
-				//repair.GET("/spec/:code", handlers.GetInstrumentalDiagnosticsBySpecialistCode)
-				repair.POST("/create", handlers.CreateInstrumentalDiagnostic)
-
-			}
-
-			computer := storage.Group("/computers")
-			{
-				computer.POST("", handlers.CreateComputerHandler)
-				computer.GET("/:id", handlers.GetComputerHandler)
-			}
+			file.POST("", news.UploadFileHandler)
 		}
+
+		statistic.RegisterStatisticRoutes(v1)
+		storage.RegisterStorageRoutes(v1)
+		news.RegisterNewsRoutes(v1)
 
 	}
 

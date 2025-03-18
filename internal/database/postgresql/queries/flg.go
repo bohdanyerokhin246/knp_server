@@ -1,15 +1,16 @@
-package postgresql
+package queries
 
 import (
-	"knp_server/internal/config"
+	"knp_server/internal/database/postgresql"
+	"knp_server/internal/models"
 )
 
-func CreatePatient(patients []config.Patient) error {
+func CreatePatient(patients []models.Patient) error {
 
-	DBMedical.Exec(`TRUNCATE flg.patients RESTART IDENTITY`)
+	postgresql.DB.Medical.Exec(`TRUNCATE flg.patients RESTART IDENTITY`)
 
 	for _, patient := range patients {
-		result := DBMedical.Create(&patient)
+		result := postgresql.DB.Medical.Create(&patient)
 		if result.Error != nil {
 			return result.Error
 		}
@@ -17,10 +18,10 @@ func CreatePatient(patients []config.Patient) error {
 	return nil
 }
 
-func CreateDiagnose(diagnoses []config.Diagnose) error {
+func CreateDiagnose(diagnoses []models.DiagnoseFLG) error {
 
 	for _, diagnose := range diagnoses {
-		result := DBMedical.Create(&diagnose)
+		result := postgresql.DB.Medical.Create(&diagnose)
 		if result.Error != nil {
 			return result.Error
 		}
@@ -29,12 +30,12 @@ func CreateDiagnose(diagnoses []config.Diagnose) error {
 	return nil
 }
 
-func CreateExam(exams []config.Exam) error {
+func CreateExam(exams []models.Exam) error {
 
-	DBMedical.Exec(`TRUNCATE flg.exams RESTART IDENTITY`)
+	postgresql.DB.Medical.Exec(`TRUNCATE flg.exams RESTART IDENTITY`)
 
 	for _, exam := range exams {
-		result := DBMedical.Create(&exam)
+		result := postgresql.DB.Medical.Create(&exam)
 		if result.Error != nil {
 			return result.Error
 		}
@@ -43,12 +44,12 @@ func CreateExam(exams []config.Exam) error {
 	return nil
 }
 
-func CreateTherapist(therapists []config.Therapist) error {
+func CreateTherapist(therapists []models.Therapist) error {
 
-	DBMedical.Exec(`TRUNCATE flg.therapists RESTART IDENTITY`)
+	postgresql.DB.Medical.Exec(`TRUNCATE flg.therapists RESTART IDENTITY`)
 
 	for _, therapist := range therapists {
-		result := DBMedical.Create(&therapist)
+		result := postgresql.DB.Medical.Create(&therapist)
 		if result.Error != nil {
 			return result.Error
 		}
@@ -57,11 +58,11 @@ func CreateTherapist(therapists []config.Therapist) error {
 	return nil
 }
 
-func GetExams() ([]config.ExamDetails, error) {
+func GetExams() ([]models.ExamDetails, error) {
 
-	var exams []config.ExamDetails
+	var exams []models.ExamDetails
 
-	err := DBMedical.Table("flg.exams").
+	err := postgresql.DB.Medical.Table("flg.exams").
 		Limit(1000).
 		Select("exams.exam_id, exams.exam_date, flg.diagnoses.diagnose AS diagnose_name, flg.patients.full_name AS full_name, flg.therapists.full_name AS therapist_name").
 		Joins("left join flg.patients on flg.patients.id = flg.exams.patient_id").
